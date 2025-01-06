@@ -1,3 +1,22 @@
+import whiteBishop from './whiteBishop.png'
+import blackBishop from './blackBishop.png'
+
+import whiteRook from './whiteRook.png'
+import blackRook from './blackRook.png'
+
+import whiteKnight from './whiteKnight.png'
+import blackKnight from './blackKnight.png'
+
+import whiteKing from './whiteKing.png'
+import blackKing from './blackKing.png'
+
+import whiteQueen from './whiteQueen.png'
+import blackQueen from './blackQueen.png'
+
+import whitePawn from './whitePawn.png'
+import blackPawn from './blackPawn.png'
+
+
 interface Piece {
     /** 
      * Immutable piece at a given position on a chess board with a given color
@@ -5,6 +24,7 @@ interface Piece {
 
     readonly position: Coordinate; // X position of the piece, with the left side having lower x positions
     readonly color: 'White' | 'Black'; // color of the piece
+    readonly icon: ImageBitmap;
 
     /**
      * @param board representation of the current state of the board
@@ -25,7 +45,7 @@ interface Piece {
     move(newPosition: Coordinate, board: Board): Board;
 }
 
-class Coordinate {
+export class Coordinate {
     /**
      * Immutable coordinate (xPosition, yPosition), 
      * with the top left corner of the board being (0,0)
@@ -54,7 +74,7 @@ class Coordinate {
     }
 }
 
-class Board {
+export class Board {
     /**
      * Immutable board with an array giving the pieces on the board and their positions
      */
@@ -132,21 +152,21 @@ class Board {
     }
 }
 
-class Pawn implements Piece {
+export class Pawn implements Piece {
     public constructor(
         public readonly position: Coordinate, 
         public readonly color: 'White' | 'Black'
     ) {}
 
     public getAvailableMoves(board: Board): Coordinate[] {
-        const availableMoves: Coordinate[] = new Array<Coordinate>;
+        const availableMoves: Coordinate[] = new Array<Coordinate>();
         let forward = new Coordinate(this.position.x, this.position.y - 1);
-            let left = new Coordinate(this.position.x - 1, this.position.y - 1);
-            let right = new Coordinate(this.position.x + 1, this.position.y - 1);
-        if (this.color == 'Black') {
-            let forward = new Coordinate(this.position.x, this.position.y + 1);
-            let left = new Coordinate(this.position.x - 1, this.position.y + 1);
-            let right = new Coordinate(this.position.x + 1, this.position.y + 1);
+        let left = new Coordinate(this.position.x - 1, this.position.y - 1);
+        let right = new Coordinate(this.position.x + 1, this.position.y - 1);
+        if (this.color === 'Black') {
+            forward = new Coordinate(this.position.x, this.position.y + 1);
+            left = new Coordinate(this.position.x - 1, this.position.y + 1);
+            right = new Coordinate(this.position.x + 1, this.position.y + 1);
         }
 
         if (forward.inBounds()) {
@@ -206,14 +226,14 @@ class Pawn implements Piece {
     }
 }
 
-class Bishop implements Piece {
+export class Bishop implements Piece {
     public constructor(
         public readonly position: Coordinate, 
         public readonly color: 'White' | 'Black'
     ) {}
 
     public getAvailableMoves(board: Board): Coordinate[] {
-        const availableMoves: Coordinate[] = new Array<Coordinate>;
+        const availableMoves: Coordinate[] = new Array<Coordinate>();
         
         for (let direction of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) {
             let x = this.position.x + direction[0];
@@ -262,14 +282,14 @@ class Bishop implements Piece {
     }
 }
 
-class Rook implements Piece {
+export class Rook implements Piece {
     public constructor(
         public readonly position: Coordinate, 
         public readonly color: 'White' | 'Black'
     ) {}
 
     public getAvailableMoves(board: Board): Coordinate[] {
-        const availableMoves: Coordinate[] = new Array<Coordinate>;
+        const availableMoves: Coordinate[] = new Array<Coordinate>();
         
         for (let direction of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
             let x = this.position.x + direction[0];
@@ -318,14 +338,14 @@ class Rook implements Piece {
     }
 }
 
-class Queen implements Piece {
+export class Queen implements Piece {
     public constructor(
         public readonly position: Coordinate, 
         public readonly color: 'White' | 'Black'
     ) {}
 
     public getAvailableMoves(board: Board): Coordinate[] {
-        const availableMoves: Coordinate[] = new Array<Coordinate>;
+        const availableMoves: Coordinate[] = new Array<Coordinate>();
         
         for (let direction of [[1, 1], [1, -1], [-1, 1], [-1, -1], [1, 0], [-1, 0], [0, 1], [0, -1]]) {
             let x = this.position.x + direction[0];
@@ -374,14 +394,14 @@ class Queen implements Piece {
     }
 }
 
-class King implements Piece {
+export class King implements Piece {
     public constructor(
         public readonly position: Coordinate, 
         public readonly color: 'White' | 'Black'
     ) {}
 
     public getAvailableMoves(board: Board): Coordinate[] {
-        const availableMoves: Coordinate[] = new Array<Coordinate>;
+        const availableMoves: Coordinate[] = new Array<Coordinate>();
         
         for (let direction of [[1, 1], [1, -1], [-1, 1], [-1, -1], [1, 0], [-1, 0], [0, 1], [0, -1]]) {
             let x = this.position.x + direction[0];
@@ -421,14 +441,14 @@ class King implements Piece {
     }
 }
 
-class Knight implements Piece {
+export class Knight implements Piece {
     public constructor(
         public readonly position: Coordinate, 
         public readonly color: 'White' | 'Black'
     ) {}
 
     public getAvailableMoves(board: Board): Coordinate[] {
-        const availableMoves: Coordinate[] = new Array<Coordinate>;
+        const availableMoves: Coordinate[] = new Array<Coordinate>();
         
         for (let direction of [[2, 1], [1, 2], [-2, 1], [-1, 2], [2, -1], [1, -2], [-2, -1], [-1, -2]]) {
             let x = this.position.x + direction[0];
@@ -545,4 +565,11 @@ function inStalemate(color: 'White' | 'Black', board: Board): boolean {
     }
     return false;
 }
+
+
+
+
+export function handleButtonClick(position: string): void {
+    console.log(`Button clicked: ${position}`);
+  }
 
