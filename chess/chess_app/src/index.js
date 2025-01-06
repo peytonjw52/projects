@@ -3,11 +3,21 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import board from './board.jpeg'
+
+function image() {
+  return (
+    <div>
+      <h1>Welcome to My App</h1>
+      <img src={board} alt = '' style={{ width: '300px', height: 'auto' }} />
+    </div>
+  );
+}
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <image />
   </React.StrictMode>
 );
 
