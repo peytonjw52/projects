@@ -24,7 +24,7 @@ interface Piece {
 
     readonly position: Coordinate; // X position of the piece, with the left side having lower x positions
     readonly color: 'White' | 'Black'; // color of the piece
-    readonly icon: ImageBitmap;
+    readonly icon: string;
 
     /**
      * @param board representation of the current state of the board
@@ -153,10 +153,16 @@ export class Board {
 }
 
 export class Pawn implements Piece {
+    public readonly position: Coordinate;
+    public readonly icon: string;
     public constructor(
-        public readonly position: Coordinate, 
-        public readonly color: 'White' | 'Black'
-    ) {}
+        public readonly color: 'White' | 'Black',
+        x: number,
+        y: number, 
+    ) {
+        this.position = new Coordinate(x, y);
+        this.icon = color === 'White' ? whitePawn : blackPawn;
+    }
 
     public getAvailableMoves(board: Board): Coordinate[] {
         const availableMoves: Coordinate[] = new Array<Coordinate>();
@@ -218,7 +224,7 @@ export class Pawn implements Piece {
                     newPieces.push(oldPiece);
                 }
             }
-            const addedPiece: Piece = new Pawn(newPosition, this.color);
+            const addedPiece: Piece = new Pawn(this.color, newPosition.x, newPosition.y);;
             newPieces.push(addedPiece);
             return new Board(newPieces);
         }
@@ -227,10 +233,16 @@ export class Pawn implements Piece {
 }
 
 export class Bishop implements Piece {
+    public readonly position: Coordinate;
+    public readonly icon: string;
     public constructor(
-        public readonly position: Coordinate, 
-        public readonly color: 'White' | 'Black'
-    ) {}
+        public readonly color: 'White' | 'Black',
+        x: number,
+        y: number, 
+    ) {
+        this.position = new Coordinate(x, y);
+        this.icon = color === 'White' ? whiteBishop : blackBishop;
+    }
 
     public getAvailableMoves(board: Board): Coordinate[] {
         const availableMoves: Coordinate[] = new Array<Coordinate>();
@@ -274,7 +286,7 @@ export class Bishop implements Piece {
                     newPieces.push(oldPiece);
                 }
             }
-            const addedPiece: Piece = new Bishop(newPosition, this.color);
+            const addedPiece: Piece = new Bishop(this.color, newPosition.x, newPosition.y);;
             newPieces.push(addedPiece);
             return new Board(newPieces);
         }
@@ -283,10 +295,16 @@ export class Bishop implements Piece {
 }
 
 export class Rook implements Piece {
+    public readonly position: Coordinate;
+    public readonly icon: string;
     public constructor(
-        public readonly position: Coordinate, 
-        public readonly color: 'White' | 'Black'
-    ) {}
+        public readonly color: 'White' | 'Black',
+        x: number,
+        y: number, 
+    ) {
+        this.position = new Coordinate(x, y);
+        this.icon = color === 'White' ? whiteRook : blackRook;
+    }
 
     public getAvailableMoves(board: Board): Coordinate[] {
         const availableMoves: Coordinate[] = new Array<Coordinate>();
@@ -330,7 +348,7 @@ export class Rook implements Piece {
                     newPieces.push(oldPiece);
                 }
             }
-            const addedPiece: Piece = new Rook(newPosition, this.color);
+            const addedPiece: Piece = new Rook(this.color, newPosition.x, newPosition.y);;
             newPieces.push(addedPiece);
             return new Board(newPieces);
         }
@@ -339,10 +357,16 @@ export class Rook implements Piece {
 }
 
 export class Queen implements Piece {
+    public readonly position: Coordinate;
+    public readonly icon: string;
     public constructor(
-        public readonly position: Coordinate, 
-        public readonly color: 'White' | 'Black'
-    ) {}
+        public readonly color: 'White' | 'Black',
+        x: number,
+        y: number, 
+    ) {
+        this.position = new Coordinate(x, y);
+        this.icon = color === 'White' ? whiteQueen : blackQueen;
+    }
 
     public getAvailableMoves(board: Board): Coordinate[] {
         const availableMoves: Coordinate[] = new Array<Coordinate>();
@@ -386,7 +410,7 @@ export class Queen implements Piece {
                     newPieces.push(oldPiece);
                 }
             }
-            const addedPiece: Piece = new Queen(newPosition, this.color);
+            const addedPiece: Piece = new Queen(this.color, newPosition.x, newPosition.y);;
             newPieces.push(addedPiece);
             return new Board(newPieces);
         }
@@ -395,10 +419,16 @@ export class Queen implements Piece {
 }
 
 export class King implements Piece {
+    public readonly position: Coordinate;
+    public readonly icon: string;
     public constructor(
-        public readonly position: Coordinate, 
-        public readonly color: 'White' | 'Black'
-    ) {}
+        public readonly color: 'White' | 'Black',
+        x: number,
+        y: number, 
+    ) {
+        this.position = new Coordinate(x, y);
+        this.icon = color === 'White' ? whiteKing : blackKing;
+    }
 
     public getAvailableMoves(board: Board): Coordinate[] {
         const availableMoves: Coordinate[] = new Array<Coordinate>();
@@ -433,7 +463,7 @@ export class King implements Piece {
                     newPieces.push(oldPiece);
                 }
             }
-            const addedPiece: Piece = new King(newPosition, this.color);
+            const addedPiece: Piece = new King(this.color, newPosition.x, newPosition.y);;
             newPieces.push(addedPiece);
             return new Board(newPieces);
         }
@@ -442,10 +472,16 @@ export class King implements Piece {
 }
 
 export class Knight implements Piece {
+    public readonly position: Coordinate;
+    public readonly icon: string;
     public constructor(
-        public readonly position: Coordinate, 
-        public readonly color: 'White' | 'Black'
-    ) {}
+        public readonly color: 'White' | 'Black',
+        x: number,
+        y: number, 
+    ) {
+        this.position = new Coordinate(x, y);
+        this.icon = color === 'White' ? whiteKnight : blackKnight;
+    }
 
     public getAvailableMoves(board: Board): Coordinate[] {
         const availableMoves: Coordinate[] = new Array<Coordinate>();
@@ -480,7 +516,7 @@ export class Knight implements Piece {
                     newPieces.push(oldPiece);
                 }
             }
-            const addedPiece: Piece = new Knight(newPosition, this.color);
+            const addedPiece: Piece = new Knight(this.color, newPosition.x, newPosition.y);
             newPieces.push(addedPiece);
             return new Board(newPieces);
         }
@@ -569,7 +605,5 @@ function inStalemate(color: 'White' | 'Black', board: Board): boolean {
 
 
 
-export function handleButtonClick(position: string): void {
-    console.log(`Button clicked: ${position}`);
-  }
+
 
