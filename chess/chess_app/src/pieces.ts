@@ -1,22 +1,3 @@
-import whiteBishop from './whiteBishop.png'
-import blackBishop from './blackBishop.png'
-
-import whiteRook from './whiteRook.png'
-import blackRook from './blackRook.png'
-
-import whiteKnight from './whiteKnight.png'
-import blackKnight from './blackKnight.png'
-
-import whiteKing from './whiteKing.png'
-import blackKing from './blackKing.png'
-
-import whiteQueen from './whiteQueen.png'
-import blackQueen from './blackQueen.png'
-
-import whitePawn from './whitePawn.png'
-import blackPawn from './blackPawn.png'
-
-
 interface Piece {
     /** 
      * Immutable piece at a given position on a chess board with a given color
@@ -161,7 +142,7 @@ export class Pawn implements Piece {
         y: number, 
     ) {
         this.position = new Coordinate(x, y);
-        this.icon = color === 'White' ? whitePawn : blackPawn;
+        this.icon = color === 'White' ? "/images/whitePawn.png" : "/images/blackPawn.png";
     }
 
     public getAvailableMoves(board: Board): Coordinate[] {
@@ -241,7 +222,7 @@ export class Bishop implements Piece {
         y: number, 
     ) {
         this.position = new Coordinate(x, y);
-        this.icon = color === 'White' ? whiteBishop : blackBishop;
+        this.icon = color === 'White' ? "/images/whiteBishop.png" : "/images/blackBishop.png";
     }
 
     public getAvailableMoves(board: Board): Coordinate[] {
@@ -303,7 +284,7 @@ export class Rook implements Piece {
         y: number, 
     ) {
         this.position = new Coordinate(x, y);
-        this.icon = color === 'White' ? whiteRook : blackRook;
+        this.icon = color === 'White' ? "/images/whiteRook.png" : "/images/blackRook.png";
     }
 
     public getAvailableMoves(board: Board): Coordinate[] {
@@ -365,7 +346,7 @@ export class Queen implements Piece {
         y: number, 
     ) {
         this.position = new Coordinate(x, y);
-        this.icon = color === 'White' ? whiteQueen : blackQueen;
+        this.icon = color === 'White' ? "/images/whiteQueen.png" : "/images/blackQueen.png";
     }
 
     public getAvailableMoves(board: Board): Coordinate[] {
@@ -427,7 +408,7 @@ export class King implements Piece {
         y: number, 
     ) {
         this.position = new Coordinate(x, y);
-        this.icon = color === 'White' ? whiteKing : blackKing;
+        this.icon = color === 'White' ? "/images/whiteKing.png" : "/images/blackKing.png";
     }
 
     public getAvailableMoves(board: Board): Coordinate[] {
@@ -480,7 +461,7 @@ export class Knight implements Piece {
         y: number, 
     ) {
         this.position = new Coordinate(x, y);
-        this.icon = color === 'White' ? whiteKnight : blackKnight;
+        this.icon = color === 'White' ? "/images/whiteKnight.png" : "/images/blackKnight.png";
     }
 
     public getAvailableMoves(board: Board): Coordinate[] {
@@ -556,7 +537,7 @@ function inCheck(color: 'White' | 'Black', board: Board): boolean {
  * 
  * @returns true if the player of that color is in checkmate (and loses), false otherwise
  */
-function inCheckmate(color: 'White' | 'Black', board: Board): boolean {
+export function inCheckmate(color: 'White' | 'Black', board: Board): boolean {
     if (inCheck(color, board)) {
         for (let piece of board.getPieces()) {
             if (piece.color === color) {
@@ -579,7 +560,7 @@ function inCheckmate(color: 'White' | 'Black', board: Board): boolean {
  * 
  * @returns true if the player of that color is in stalemate (and the game ends in a tie), false otherwise
  */
-function inStalemate(color: 'White' | 'Black', board: Board): boolean {
+export function inStalemate(color: 'White' | 'Black', board: Board): boolean {
     if (!inCheck(color, board)) {
         for (let piece of board.getPieces()) {
             if (piece.color === color) {
