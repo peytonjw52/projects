@@ -5,33 +5,38 @@ import {Board, Pawn, Bishop, Knight, Rook, Queen, King, Coordinate, inCheckmate,
 
 function Square({ row, column, onSquareClick }) {
   return (
-    <button className="square" onClick={onSquareClick}>
-      {row + column}
-    </button>
+    <button 
+        onClick = {onSquareClick}
+        style={{
+          position: "absolute",
+          left: `${385+88*row}px`,
+          top: `${60+88*column}px`,
+          width: "88px",
+          height: "88px",
+        }}
+        >
+        
+      </button>
   );
 }
 
 function ChessBoard({board, color, selectedPiece, onPlay}) {
 
-  function handleButtonClick(row, column) {
+  function handleClick(row, column) {
       const position = new Coordinate(column, row);
   
-      if (calculateWinner(board) === null) {
-        if (selectedPiece !== null && position in selectedPiece.getAvailableMoves(board)) {
-          const newBoard = selectedPiece.move(position);
-          const newColor = color === "White" ? "Black" : "White";
-          const newSelectedPiece = null;
-          let newWinner = null;
-  
-          if (inStalemate(newColor, newBoard)) {
-            newWinner = "Tie";
+      if (calculateWinner(board, color) === null) {
+        if (selectedPiece !== null) {
+          for (let availablePosition of selectedPiece.getAvailableMoves(board)) {
+            if (position.equals(availablePosition)) {
+              const newBoard = selectedPiece.easyMove(position);
+              const newSelectedPiece = null;
+              const newColor = color === "White" ? "Black" : "White";
+              onPlay(newBoard, newSelectedPiece, newColor);
+              return;
+            }
           }
-          if (inCheckmate(newColor, newBoard)) {
-            newWinner = color;
-          }
-  
-          // setState([newBoard, newColor, newSelectedPiece, newWinner]);
-          return;
+          
         }
   
         let newSelectedPiece = selectedPiece;
@@ -48,9 +53,21 @@ function ChessBoard({board, color, selectedPiece, onPlay}) {
           }
         }
   
-        // setState([board, color, newSelectedPiece]);
+        onPlay(board, newSelectedPiece, color);
       }
     }
+
+    // const winner = calculateWinner(board, color);
+    // let status;
+    // if (winner) {
+    //   if (winner === "Tie") {
+    //     status = "Tie";
+    //   } else {
+    //     status = 'Winner: ' + winner;
+    //   }
+    // } else {
+    //   status = 'Next player: ' + color;
+    // }
 
     const rows = 8;
     const columns = 8;
@@ -86,14 +103,14 @@ function ChessBoard({board, color, selectedPiece, onPlay}) {
           <Square
             row={row}
             column={column}
-            onSquareClick={() => handleButtonClick(row, column)} // Captures row and column correctly
+            onSquareClick={() => handleClick(row, column)} // Captures row and column correctly
           />
         );
       }
     }
   
     if (selectedPiece !== null) {
-      for (let availableMove of selectedPiece.getAvailableMoves(board)) {
+      for (let availableMove of []) { //selectedPiece.getAvailableMoves(board)
         const row = availableMove.y;
         const col = availableMove.x;
         availableMoves.push(
@@ -115,22 +132,26 @@ function ChessBoard({board, color, selectedPiece, onPlay}) {
     }
   
     return (
-      <div>
-        {buttons}
-        <img
-          src="/images/board.jpg"
-          alt="Board"
-          style={{
-            position: "absolute",
-            left: "325px",
-            width: "825px",
-            height: "auto",
-            pointerEvents: "none",
-          }}
-        />
-        {pieces}
-        {availableMoves}
-      </div>
+      <>
+        <div>
+          {buttons}
+          <img
+            src="/images/board.jpg"
+            alt="Board"
+            style={{
+              position: "absolute",
+              left: "325px",
+              width: "825px",
+              height: "auto",
+              pointerEvents: "none",
+            }}
+          />
+          {pieces}
+          {availableMoves}
+        </div>
+        <div className="status">{color}</div>
+        <div className="selected">{selectedPiece}</div>
+      </>
     );
 }
 
@@ -169,9 +190,38 @@ export default function Game() {
       new Pawn("White", 6, 6),
       new Pawn("White", 7, 6),
     ]);
-  const [board, setBoard] = useState(startingPieces)
+
+  const [board, setBoard] = useState(startingPieces);
+  const [selectedPiece, setSelectedPiece] = useState(null);
+  const [color, setColor] = useState("White");
+
+  function handlePlay(newBoard, newSelectedPiece, newColor) {
+    setBoard(newBoard);
+    setSelectedPiece(newSelectedPiece);
+    setColor(newColor);
+  }
+
+
+  return (
+    <div className="game-board">
+      <ChessBoard board={board} color={color} selectedPiece = {selectedPiece} onPlay={handlePlay} />
+    </div>
+  );
 }
 
-function calculateWinner(board) {
+function calculateWinner(board, color) {
+  if (inStalemate(color, board)) {
+    return "Tie";
+  }
 
+  if (inCheckmate(color, board)) {
+    if (color === "White") {
+      return "Black"
+    }
+    if (color === "Black") {
+      return "White"
+    }
+  }
+
+  return null;
 }

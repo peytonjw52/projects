@@ -24,6 +24,16 @@ interface Piece {
      *         this piece given the current state of the board
      */
     move(newPosition: Coordinate, board: Board): Board;
+
+    /**
+     * @param newPosition position that this piece will be moved to
+     * @param board representation of the current state of the board
+     * 
+     * @returns representation of the state of the board after making the given move
+     * 
+     * This function will just move the piece to that space without considering if it is legal
+     */
+    easyMove(newPosition: Coordinate, board: Board): Board;
 }
 
 export class Coordinate {
@@ -158,7 +168,7 @@ export class Pawn implements Piece {
 
         if (forward.inBounds()) {
             if (board.isEmpty(forward)) {
-                let newBoard = this.move(forward, board);
+                let newBoard = this.easyMove(forward, board);
                 if (!inCheck(this.color, newBoard)) {
                     availableMoves.push(forward);
                 }
@@ -168,7 +178,7 @@ export class Pawn implements Piece {
         if (left.inBounds()) {
             if (!board.isEmpty(left)) {
                 if (this.color !== board.getPieceAt(left).color) {
-                    let newBoard = this.move(left, board);
+                    let newBoard = this.easyMove(left, board);
                 if (!inCheck(this.color, newBoard)) {
                     availableMoves.push(left);
                 }
@@ -179,7 +189,7 @@ export class Pawn implements Piece {
         if (right.inBounds()) {
             if (!board.isEmpty(left)) {
                 if (this.color !== board.getPieceAt(right).color) {
-                    let newBoard = this.move(right, board);
+                    let newBoard = this.easyMove(right, board);
                 if (!inCheck(this.color, newBoard)) {
                     availableMoves.push(right);
                 }
@@ -189,6 +199,20 @@ export class Pawn implements Piece {
 
         return availableMoves;    
     }
+
+    public easyMove(newPosition: Coordinate, board: Board): Board {
+        const oldPieces = board.getPieces();
+        const newPieces: Piece[] = [];
+        for (let oldPiece of oldPieces) {
+            if (!oldPiece.position.equals(newPosition) && !oldPiece.position.equals(this.position)) {
+                newPieces.push(oldPiece);
+            }
+        }
+        const addedPiece: Piece = new Pawn(this.color, newPosition.x, newPosition.y);;
+        newPieces.push(addedPiece);
+        return new Board(newPieces);
+    }
+
 
     public move(newPosition: Coordinate, board: Board): Board {
         let validMove = false; // true if moving to newPosition is a valid move, false otherwise
@@ -233,7 +257,7 @@ export class Bishop implements Piece {
             let y = this.position.y + direction[1];
             let newPosition = new Coordinate(x, y);
             while (newPosition.inBounds() && board.isEmpty(newPosition)) {
-                let newBoard = this.move(newPosition, board);
+                let newBoard = this.easyMove(newPosition, board);
                 if (!inCheck(this.color, newBoard)) {
                     availableMoves.push(newPosition);
                 }
@@ -242,7 +266,7 @@ export class Bishop implements Piece {
                 newPosition = new Coordinate(x, y);
             }
             if (newPosition.inBounds() && board.getPieceAt(newPosition).color !== this.color) {
-                let newBoard = this.move(newPosition, board);
+                let newBoard = this.easyMove(newPosition, board);
                 if (!inCheck(this.color, newBoard)) {
                     availableMoves.push(newPosition);
                 }
@@ -250,6 +274,19 @@ export class Bishop implements Piece {
         }
 
         return availableMoves;   
+    }
+
+    public easyMove(newPosition: Coordinate, board: Board): Board {
+        const oldPieces = board.getPieces();
+        const newPieces: Piece[] = [];
+        for (let oldPiece of oldPieces) {
+            if (!oldPiece.position.equals(newPosition) && !oldPiece.position.equals(this.position)) {
+                newPieces.push(oldPiece);
+            }
+        }
+        const addedPiece: Piece = new Bishop(this.color, newPosition.x, newPosition.y);;
+        newPieces.push(addedPiece);
+        return new Board(newPieces);
     }
 
     public move(newPosition: Coordinate, board: Board): Board {
@@ -295,7 +332,7 @@ export class Rook implements Piece {
             let y = this.position.y + direction[1];
             let newPosition = new Coordinate(x, y);
             while (newPosition.inBounds() && board.isEmpty(newPosition)) {
-                let newBoard = this.move(newPosition, board);
+                let newBoard = this.easyMove(newPosition, board);
                 if (!inCheck(this.color, newBoard)) {
                     availableMoves.push(newPosition);
                 }
@@ -304,7 +341,7 @@ export class Rook implements Piece {
                 newPosition = new Coordinate(x, y);
             }
             if (newPosition.inBounds() && board.getPieceAt(newPosition).color !== this.color) {
-                let newBoard = this.move(newPosition, board);
+                let newBoard = this.easyMove(newPosition, board);
                 if (!inCheck(this.color, newBoard)) {
                     availableMoves.push(newPosition);
                 }
@@ -312,6 +349,19 @@ export class Rook implements Piece {
         }
 
         return availableMoves;   
+    }
+
+    public easyMove(newPosition: Coordinate, board: Board): Board {
+        const oldPieces = board.getPieces();
+        const newPieces: Piece[] = [];
+        for (let oldPiece of oldPieces) {
+            if (!oldPiece.position.equals(newPosition) && !oldPiece.position.equals(this.position)) {
+                newPieces.push(oldPiece);
+            }
+        }
+        const addedPiece: Piece = new Rook(this.color, newPosition.x, newPosition.y);;
+        newPieces.push(addedPiece);
+        return new Board(newPieces);
     }
 
     public move(newPosition: Coordinate, board: Board): Board {
@@ -357,7 +407,7 @@ export class Queen implements Piece {
             let y = this.position.y + direction[1];
             let newPosition = new Coordinate(x, y);
             while (newPosition.inBounds() && board.isEmpty(newPosition)) {
-                let newBoard = this.move(newPosition, board);
+                let newBoard = this.easyMove(newPosition, board);
                 if (!inCheck(this.color, newBoard)) {
                     availableMoves.push(newPosition);
                 }
@@ -366,7 +416,7 @@ export class Queen implements Piece {
                 newPosition = new Coordinate(x, y);
             }
             if (newPosition.inBounds() && board.getPieceAt(newPosition).color !== this.color) {
-                let newBoard = this.move(newPosition, board);
+                let newBoard = this.easyMove(newPosition, board);
                 if (!inCheck(this.color, newBoard)) {
                     availableMoves.push(newPosition);
                 }
@@ -374,6 +424,19 @@ export class Queen implements Piece {
         }
 
         return availableMoves;   
+    }
+
+    public easyMove(newPosition: Coordinate, board: Board): Board {
+        const oldPieces = board.getPieces();
+        const newPieces: Piece[] = [];
+        for (let oldPiece of oldPieces) {
+            if (!oldPiece.position.equals(newPosition) && !oldPiece.position.equals(this.position)) {
+                newPieces.push(oldPiece);
+            }
+        }
+        const addedPiece: Piece = new Queen(this.color, newPosition.x, newPosition.y);;
+        newPieces.push(addedPiece);
+        return new Board(newPieces);
     }
 
     public move(newPosition: Coordinate, board: Board): Board {
@@ -419,7 +482,7 @@ export class King implements Piece {
             let y = this.position.y + direction[1];
             let newPosition = new Coordinate(x, y);
             if (newPosition.inBounds()) {
-                let newBoard = this.move(newPosition, board);
+                let newBoard = this.easyMove(newPosition, board);
                 if (!inCheck(this.color, newBoard)) {
                     availableMoves.push(newPosition);
                 }
@@ -427,6 +490,19 @@ export class King implements Piece {
         }
 
         return availableMoves;   
+    }
+
+    public easyMove(newPosition: Coordinate, board: Board): Board {
+        const oldPieces = board.getPieces();
+        const newPieces: Piece[] = [];
+        for (let oldPiece of oldPieces) {
+            if (!oldPiece.position.equals(newPosition) && !oldPiece.position.equals(this.position)) {
+                newPieces.push(oldPiece);
+            }
+        }
+        const addedPiece: Piece = new King(this.color, newPosition.x, newPosition.y);;
+        newPieces.push(addedPiece);
+        return new Board(newPieces);
     }
 
     public move(newPosition: Coordinate, board: Board): Board {
@@ -472,7 +548,7 @@ export class Knight implements Piece {
             let y = this.position.y + direction[1];
             let newPosition = new Coordinate(x, y);
             if (newPosition.inBounds()) {
-                let newBoard = this.move(newPosition, board);
+                let newBoard = this.easyMove(newPosition, board);
                 if (!inCheck(this.color, newBoard)) {
                     availableMoves.push(newPosition);
                 }
@@ -480,6 +556,19 @@ export class Knight implements Piece {
         }
 
         return availableMoves;   
+    }
+
+    public easyMove(newPosition: Coordinate, board: Board): Board {
+        const oldPieces = board.getPieces();
+        const newPieces: Piece[] = [];
+        for (let oldPiece of oldPieces) {
+            if (!oldPiece.position.equals(newPosition) && !oldPiece.position.equals(this.position)) {
+                newPieces.push(oldPiece);
+            }
+        }
+        const addedPiece: Piece = new Knight(this.color, newPosition.x, newPosition.y);;
+        newPieces.push(addedPiece);
+        return new Board(newPieces);
     }
 
     public move(newPosition: Coordinate, board: Board): Board {
@@ -520,7 +609,7 @@ function inCheck(color: 'White' | 'Black', board: Board): boolean {
     }
 
     for (let piece of board.getPieces()) {
-        if (piece.color !== this.color) {
+        if (piece.color !== color) {
             for (let availablePosition of piece.getAvailableMoves(board)) {
                 if (availablePosition.equals(kingPosition)) {
                     return true
