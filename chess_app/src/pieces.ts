@@ -81,9 +81,8 @@ export class Board {
                     return false;
                 }
             }
-            return true;
         }
-        throw new Error('Illegal coordinate');
+        return true;
     }
 
     /**
@@ -102,26 +101,6 @@ export class Board {
                 }
             }
             throw new Error('No Piece In Space');
-        }
-        throw new Error('Illegal coordinate');
-    }
-
-    /**
-     * @param coordinate coordinate of the space to check get the piece at
-     * 
-     * @returns the piece in that space, or 'Empty' if there is no piece there
-     * 
-     * @throws if the coordinate is not on the board
-     */
-    public getAt(coordinate: Coordinate): Piece | 'Empty' {
-
-        if (coordinate.inBounds()) {
-            for (let piece of this.pieces) {
-                if (piece.position.equals(coordinate)) {
-                    return piece;
-                }
-            }
-            return 'Empty';
         }
         throw new Error('Illegal coordinate');
     }

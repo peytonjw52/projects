@@ -190,7 +190,7 @@ export default function Game() {
     ]);
 
   const [board, setBoard] = useState(startingPieces);
-  const [selectedPiece, setSelectedPiece] = useState(null);
+  const [selectedPiece, setSelectedPiece] = useState(startingPieces[0]);
   const [color, setColor] = useState("White");
 
   function handlePlay(newBoard, newSelectedPiece, newColor) {
