@@ -23,6 +23,8 @@ interface Piece {
      * 
      * @returns representation of the state of the board after making the given move
      * 
+     * @throws if the new position is out of bounds
+     * 
      * This function will just move the piece to that space without considering if it is legal
      */
     move(newPosition: Coordinate, board: Board): Board;
@@ -81,6 +83,8 @@ export class Board {
                     return false;
                 }
             }
+        } else {
+            throw new Error("Coordinate out of bounds");
         }
         return true;
     }
@@ -138,6 +142,9 @@ export class Pawn implements Piece {
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     public getOpenMoves(board: Board): Coordinate[] {
         const openMoves: Coordinate[] = new Array<Coordinate>();
         let forward = new Coordinate(this.position.column, this.position.row - 1);
@@ -163,6 +170,7 @@ export class Pawn implements Piece {
             }
         }
 
+
         if (left.inBounds()) {
             if (!board.isEmpty(left)) {
                 if (this.color !== board.getPieceAt(left).color) {
@@ -171,8 +179,9 @@ export class Pawn implements Piece {
             }
         }
 
+
         if (right.inBounds()) {
-            if (!board.isEmpty(left)) {
+            if (!board.isEmpty(right)) {
                 if (this.color !== board.getPieceAt(right).color) {
                     openMoves.push(right);
                 }
@@ -182,7 +191,13 @@ export class Pawn implements Piece {
         return openMoves;    
     }
 
+    /**
+     * @inheritdoc
+     */
     public move(newPosition: Coordinate, board: Board): Board {
+        if (!newPosition.inBounds()) {
+            throw new Error("Moving piece out of bounds");
+        }
         const oldPieces = board.getPieces();
         const newPieces: Piece[] = [];
         for (let oldPiece of oldPieces) {
@@ -216,18 +231,25 @@ export class Bishop implements Piece {
         this.icon = color === 'White' ? "/images/whiteBishop.png" : "/images/blackBishop.png";
     }
 
+    /**
+     * @inheritdoc
+     */
     public getOpenMoves(board: Board): Coordinate[] {
         const openMoves: Coordinate[] = new Array<Coordinate>();
         
         for (let direction of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) {
-            let x = this.position.column + direction[0];
-            let y = this.position.row + direction[1];
-            let newPosition = new Coordinate(x, y);
-            while (newPosition.inBounds() && board.isEmpty(newPosition)) {
-                openMoves.push(newPosition);
-                x += direction[0];
-                y += direction[1];
-                newPosition = new Coordinate(x, y);
+            let newColumn = this.position.column + direction[0];
+            let newRow = this.position.row + direction[1];
+            let newPosition = new Coordinate(newColumn, newRow);
+            while (newPosition.inBounds()) {
+                if (board.isEmpty(newPosition)) {
+                    openMoves.push(newPosition);
+                    newColumn += direction[0];
+                    newRow += direction[1];
+                    newPosition = new Coordinate(newColumn, newRow);
+                } else {
+                    break;
+                }
             }
             if (newPosition.inBounds() && board.getPieceAt(newPosition).color !== this.color) {
                 openMoves.push(newPosition);
@@ -237,7 +259,13 @@ export class Bishop implements Piece {
         return openMoves;   
     }
 
+    /**
+     * @inheritdoc 
+     */
     public move(newPosition: Coordinate, board: Board): Board {
+        if (!newPosition.inBounds()) {
+            throw new Error("Moving piece out of bounds");
+        }
         const oldPieces = board.getPieces();
         const newPieces: Piece[] = [];
         for (let oldPiece of oldPieces) {
@@ -264,28 +292,43 @@ export class Rook implements Piece {
         this.icon = color === 'White' ? "/images/whiteRook.png" : "/images/blackRook.png";
     }
 
+    /**
+     * @inheritdoc
+     */
     public getOpenMoves(board: Board): Coordinate[] {
         const openMoves: Coordinate[] = new Array<Coordinate>();
         
         for (let direction of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-            let x = this.position.column + direction[0];
-            let y = this.position.row + direction[1];
-            let newPosition = new Coordinate(x, y);
-            while (newPosition.inBounds() && board.isEmpty(newPosition)) {
-                openMoves.push(newPosition);
-                x += direction[0];
-                y += direction[1];
-                newPosition = new Coordinate(x, y);
+            let newColumn = this.position.column + direction[0];
+            let newRow = this.position.row + direction[1];
+            let newPosition = new Coordinate(newColumn, newRow);
+            while (newPosition.inBounds()) {
+                if (board.isEmpty(newPosition)) {
+                    openMoves.push(newPosition);
+                    newColumn += direction[0];
+                    newRow += direction[1];
+                    newPosition = new Coordinate(newColumn, newRow);
+                } else {
+                    break;
+                }
             }
-            if (newPosition.inBounds() && board.getPieceAt(newPosition).color !== this.color) {
-                openMoves.push(newPosition);
+            if (newPosition.inBounds()) {
+                if (board.getPieceAt(newPosition).color !== this.color) {
+                    openMoves.push(newPosition);
+                }
             } 
         }
 
         return openMoves;   
     }
 
+    /**
+     * @inheritdoc
+     */
     public move(newPosition: Coordinate, board: Board): Board {
+        if (!newPosition.inBounds()) {
+            throw new Error("Moving piece out of bounds");
+        }
         const oldPieces = board.getPieces();
         const newPieces: Piece[] = [];
         for (let oldPiece of oldPieces) {
@@ -312,28 +355,43 @@ export class Queen implements Piece {
         this.icon = color === 'White' ? "/images/whiteQueen.png" : "/images/blackQueen.png";
     }
 
+    /**
+     * @inheritdoc
+     */
     public getOpenMoves(board: Board): Coordinate[] {
         const openMoves: Coordinate[] = new Array<Coordinate>();
         
         for (let direction of [[1, 1], [1, -1], [-1, 1], [-1, -1], [1, 0], [-1, 0], [0, 1], [0, -1]]) {
-            let x = this.position.column + direction[0];
-            let y = this.position.row + direction[1];
-            let newPosition = new Coordinate(x, y);
-            while (newPosition.inBounds() && board.isEmpty(newPosition)) {
-                openMoves.push(newPosition);
-                x += direction[0];
-                y += direction[1];
-                newPosition = new Coordinate(x, y);
+            let newColumn = this.position.column + direction[0];
+            let newRow = this.position.row + direction[1];
+            let newPosition = new Coordinate(newColumn, newRow);
+            while (newPosition.inBounds()) {
+                if (board.isEmpty(newPosition)) {
+                    openMoves.push(newPosition);
+                    newColumn += direction[0];
+                    newRow += direction[1];
+                    newPosition = new Coordinate(newColumn, newRow);
+                } else {
+                    break;
+                }
             }
-            if (newPosition.inBounds() && board.getPieceAt(newPosition).color !== this.color) {
-                openMoves.push(newPosition);
+            if (newPosition.inBounds()) {
+                if (board.getPieceAt(newPosition).color !== this.color) {
+                    openMoves.push(newPosition);
+                }
             } 
         }
 
         return openMoves;   
     }
 
+    /**
+     * @inheritdoc
+     */
     public move(newPosition: Coordinate, board: Board): Board {
+        if (!newPosition.inBounds()) {
+            throw new Error("Moving piece out of bounds");
+        }
         const oldPieces = board.getPieces();
         const newPieces: Piece[] = [];
         for (let oldPiece of oldPieces) {
@@ -360,22 +418,40 @@ export class King implements Piece {
         this.icon = color === 'White' ? "/images/whiteKing.png" : "/images/blackKing.png";
     }
 
+    /**
+     * @inheritdoc
+     */
     public getOpenMoves(board: Board): Coordinate[] {
         const openMoves: Coordinate[] = new Array<Coordinate>();
         
         for (let direction of [[1, 1], [1, -1], [-1, 1], [-1, -1], [1, 0], [-1, 0], [0, 1], [0, -1]]) {
-            let x = this.position.column + direction[0];
-            let y = this.position.row + direction[1];
-            let newPosition = new Coordinate(x, y);
+            let newColumn = this.position.column + direction[0];
+            let newRow = this.position.row + direction[1];
+            let newPosition = new Coordinate(newColumn, newRow);
+            let isOpenMove = true;
             if (newPosition.inBounds()) {
-                openMoves.push(newPosition);
+                if (!board.isEmpty(newPosition)) {
+                    if (board.getPieceAt(newPosition).color === this.color) {
+                        isOpenMove = false;
+                    }
+                }
+
+                if (isOpenMove) {
+                    openMoves.push(newPosition);
+                }
             }
         }
 
         return openMoves;   
     }
 
+    /**
+     * @inheritdoc
+     */
     public move(newPosition: Coordinate, board: Board): Board {
+        if (!newPosition.inBounds()) {
+            throw new Error("Moving piece out of bounds");
+        }
         const oldPieces = board.getPieces();
         const newPieces: Piece[] = [];
         for (let oldPiece of oldPieces) {
@@ -402,22 +478,40 @@ export class Knight implements Piece {
         this.icon = color === 'White' ? "/images/whiteKnight.png" : "/images/blackKnight.png";
     }
 
+    /**
+     * @inheritdoc
+     */
     public getOpenMoves(board: Board): Coordinate[] {
         const openMoves: Coordinate[] = new Array<Coordinate>();
         
         for (let direction of [[2, 1], [1, 2], [-2, 1], [-1, 2], [2, -1], [1, -2], [-2, -1], [-1, -2]]) {
-            let x = this.position.column + direction[0];
-            let y = this.position.row + direction[1];
-            let newPosition = new Coordinate(x, y);
+            let newColumn = this.position.column + direction[0];
+            let newRow = this.position.row + direction[1];
+            let newPosition = new Coordinate(newColumn, newRow);
+            let isOpenMove = true;
             if (newPosition.inBounds()) {
-                openMoves.push(newPosition);
+                if (!board.isEmpty(newPosition)) {
+                    if (board.getPieceAt(newPosition).color === this.color) {
+                        isOpenMove = false;
+                    }
+                }
+
+                if (isOpenMove) {
+                    openMoves.push(newPosition);
+                }
             }
         }
 
         return openMoves;   
     }
 
+    /**
+     * @inheritdoc
+     */
     public move(newPosition: Coordinate, board: Board): Board {
+        if (!newPosition.inBounds()) {
+            throw new Error("Moving piece out of bounds");
+        }
         const oldPieces = board.getPieces();
         const newPieces: Piece[] = [];
         for (let oldPiece of oldPieces) {
@@ -444,6 +538,7 @@ export function getAvailableMoves(piece: Piece, board: Board): Coordinate[] {
             availableMoves.push(openMove);
         }
     }
+
     return availableMoves;
 
 }
@@ -453,13 +548,21 @@ export function getAvailableMoves(piece: Piece, board: Board): Coordinate[] {
  * @param board representation of the current state of the board
  * 
  * @returns true if the player of that color is in check, false otherwise
+ * 
+ * @throws if no king is found
  */
 export function inCheck(color: 'White' | 'Black', board: Board): boolean {
+    let noKingFound = true;
     let kingPosition: Coordinate = new Coordinate(-1, -1);
     for (let piece of board.getPieces()) {
         if (piece instanceof King && piece.color === color) {
             kingPosition = piece.position;
+            noKingFound = false;
         }
+    }
+
+    if (noKingFound) {
+        throw new Error("Must have a king");
     }
 
     for (let piece of board.getPieces()) {
@@ -482,18 +585,17 @@ export function inCheck(color: 'White' | 'Black', board: Board): boolean {
  * @returns true if the player of that color is in checkmate (and loses), false otherwise
  */
 export function inCheckmate(color: 'White' | 'Black', board: Board): boolean {
+    if (inCheck(color, board)) {
+        for (let piece of board.getPieces()) {
+            if (piece.color === color) {
+                if (getAvailableMoves(piece,board).length !== 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
     return false;
-    // if (inCheck(color, board)) {
-    //     for (let piece of board.getPieces()) {
-    //         if (piece.color === color) {
-    //             if (getAvailableMoves(piece,board).length !== 0) {
-    //                 return false;
-    //             }
-    //         }
-    //     }
-    //     return true;
-    // }
-    // return false;
 }
 
 /**
@@ -503,18 +605,17 @@ export function inCheckmate(color: 'White' | 'Black', board: Board): boolean {
  * @returns true if the player of that color is in stalemate (and the game ends in a tie), false otherwise
  */
 export function inStalemate(color: 'White' | 'Black', board: Board): boolean {
+    if (!inCheck(color, board)) {
+        for (let piece of board.getPieces()) {
+            if (piece.color === color) {
+                if (getAvailableMoves(piece, board).length !== 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
     return false;
-    // if (!inCheck(color, board)) {
-    //     for (let piece of board.getPieces()) {
-    //         if (piece.color === color) {
-    //             if (getAvailableMoves(piece, board).length !== 0) {
-    //                 return false;
-    //             }
-    //         }
-    //     }
-    //     return true;
-    // }
-    // return false;
 }
 
 
