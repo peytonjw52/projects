@@ -117,15 +117,25 @@ export class Board {
 export class Pawn implements Piece {
     public readonly position: Coordinate;
     public readonly icon: string;
-    public firstMove: boolean
+    public readonly firstMove: boolean
     public constructor(
         public readonly color: 'White' | 'Black',
-        x: number,
-        y: number, 
+        column: number,
+        row: number, 
     ) {
-        this.position = new Coordinate(x, y);
+        this.position = new Coordinate(column, row);
         this.icon = color === 'White' ? "/images/whitePawn.png" : "/images/blackPawn.png";
-        this.firstMove = true;
+        this.firstMove = false;
+        if (this.color === "White") {
+            if (row === 6) {
+                this.firstMove = true;
+            }
+        }
+        if (this.color === "Black") {
+            if (row === 1) {
+                this.firstMove = true;
+            }
+        }
     }
 
     public getOpenMoves(board: Board): Coordinate[] {
@@ -180,7 +190,14 @@ export class Pawn implements Piece {
                 newPieces.push(oldPiece);
             }
         }
-        const addedPiece: Piece = new Pawn(this.color, newPosition.column, newPosition.row);;
+
+        let addedPiece: Piece = new Pawn(this.color, newPosition.column, newPosition.row);
+        if (this.color === "White" && newPosition.row === 0) {
+            addedPiece = new Queen(this.color, newPosition.column, newPosition.row);
+        }
+        if (this.color === "Black" && newPosition.row === 7) {
+            addedPiece = new Queen(this.color, newPosition.column, newPosition.row);
+        }
         newPieces.push(addedPiece);
         return new Board(newPieces);
     }
@@ -192,10 +209,10 @@ export class Bishop implements Piece {
     public readonly icon: string;
     public constructor(
         public readonly color: 'White' | 'Black',
-        x: number,
-        y: number, 
+        column: number,
+        row: number, 
     ) {
-        this.position = new Coordinate(x, y);
+        this.position = new Coordinate(column, row);
         this.icon = color === 'White' ? "/images/whiteBishop.png" : "/images/blackBishop.png";
     }
 
@@ -240,10 +257,10 @@ export class Rook implements Piece {
     public readonly icon: string;
     public constructor(
         public readonly color: 'White' | 'Black',
-        x: number,
-        y: number, 
+        column: number,
+        row: number, 
     ) {
-        this.position = new Coordinate(x, y);
+        this.position = new Coordinate(column, row);
         this.icon = color === 'White' ? "/images/whiteRook.png" : "/images/blackRook.png";
     }
 
@@ -288,10 +305,10 @@ export class Queen implements Piece {
     public readonly icon: string;
     public constructor(
         public readonly color: 'White' | 'Black',
-        x: number,
-        y: number, 
+        column: number,
+        row: number, 
     ) {
-        this.position = new Coordinate(x, y);
+        this.position = new Coordinate(column, row);
         this.icon = color === 'White' ? "/images/whiteQueen.png" : "/images/blackQueen.png";
     }
 
@@ -336,10 +353,10 @@ export class King implements Piece {
     public readonly icon: string;
     public constructor(
         public readonly color: 'White' | 'Black',
-        x: number,
-        y: number, 
+        column: number,
+        row: number, 
     ) {
-        this.position = new Coordinate(x, y);
+        this.position = new Coordinate(column, row);
         this.icon = color === 'White' ? "/images/whiteKing.png" : "/images/blackKing.png";
     }
 
@@ -378,10 +395,10 @@ export class Knight implements Piece {
     public readonly icon: string;
     public constructor(
         public readonly color: 'White' | 'Black',
-        x: number,
-        y: number, 
+        column: number,
+        row: number, 
     ) {
-        this.position = new Coordinate(x, y);
+        this.position = new Coordinate(column, row);
         this.icon = color === 'White' ? "/images/whiteKnight.png" : "/images/blackKnight.png";
     }
 
@@ -437,7 +454,7 @@ export function getAvailableMoves(piece: Piece, board: Board): Coordinate[] {
  * 
  * @returns true if the player of that color is in check, false otherwise
  */
-function inCheck(color: 'White' | 'Black', board: Board): boolean {
+export function inCheck(color: 'White' | 'Black', board: Board): boolean {
     let kingPosition: Coordinate = new Coordinate(-1, -1);
     for (let piece of board.getPieces()) {
         if (piece instanceof King && piece.color === color) {
