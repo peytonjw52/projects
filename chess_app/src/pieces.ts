@@ -30,12 +30,11 @@ interface Piece {
     move(newPosition: Coordinate, board: Board): Board;
 }
 
+/**
+ * Immutable coordinate (column, row), 
+ * with the top left corner of the board being (0,0)
+ */
 export class Coordinate {
-    /**
-     * Immutable coordinate (xPosition, yPosition), 
-     * with the top left corner of the board being (0,0)
-     */
-
     public constructor(
         public readonly column: number,
         public readonly row: number
@@ -59,10 +58,10 @@ export class Coordinate {
     }
 }
 
+/**
+ * Immutable board with an array giving the pieces on the board and their positions
+ */
 export class Board {
-    /**
-     * Immutable board with an array giving the pieces on the board and their positions
-     */
 
     public constructor(
         private pieces: Array<Piece>
