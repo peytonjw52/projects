@@ -95,7 +95,7 @@ describe("Pawn", () => {
             const pawn = pieces[0]
             const actualOpenMoves = pawn.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -111,7 +111,7 @@ describe("Pawn", () => {
             const pawn = pieces[0]
             const actualOpenMoves = pawn.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -175,7 +175,7 @@ describe("Pawn", () => {
             const pawn = pieces[0]
             const actualOpenMoves = pawn.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -191,7 +191,7 @@ describe("Pawn", () => {
             const pawn = pieces[0]
             const actualOpenMoves = pawn.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -209,7 +209,7 @@ describe("Pawn", () => {
             const pawn = pieces[0]
             const actualOpenMoves = pawn.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -227,7 +227,7 @@ describe("Pawn", () => {
             const pawn = pieces[0]
             const actualOpenMoves = pawn.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -245,7 +245,7 @@ describe("Pawn", () => {
             const pawn = pieces[0]
             const actualOpenMoves = pawn.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -263,7 +263,7 @@ describe("Pawn", () => {
             const pawn = pieces[0]
             const actualOpenMoves = pawn.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -278,7 +278,7 @@ describe("Pawn", () => {
             const pawn = pieces[0]
             const actualOpenMoves = pawn.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -293,7 +293,7 @@ describe("Pawn", () => {
             const pawn = pieces[0]
             const actualOpenMoves = pawn.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -495,7 +495,7 @@ describe("Bishop", () => {
             const bishop = pieces[0]
             const actualOpenMoves = bishop.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -522,7 +522,7 @@ describe("Bishop", () => {
             const bishop = pieces[0]
             const actualOpenMoves = bishop.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -548,7 +548,7 @@ describe("Bishop", () => {
             const bishop = pieces[0]
             const actualOpenMoves = bishop.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -619,7 +619,7 @@ describe("Rook", () => {
             const rook = pieces[0]
             const actualOpenMoves = rook.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -647,7 +647,7 @@ describe("Rook", () => {
             const rook = pieces[0]
             const actualOpenMoves = rook.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -674,7 +674,7 @@ describe("Rook", () => {
             const rook = pieces[0]
             const actualOpenMoves = rook.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -758,7 +758,7 @@ describe("Queen", () => {
             const queen = pieces[0]
             const actualOpenMoves = queen.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -799,7 +799,7 @@ describe("Queen", () => {
             const queen = pieces[0]
             const actualOpenMoves = queen.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -839,7 +839,7 @@ describe("Queen", () => {
             const queen = pieces[0]
             const actualOpenMoves = queen.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -880,7 +880,7 @@ describe("Queen", () => {
             const queen = pieces[0]
             const actualOpenMoves = queen.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -919,7 +919,7 @@ describe("Queen", () => {
             const queen = pieces[0]
             const actualOpenMoves = queen.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
     });
@@ -983,7 +983,7 @@ describe("Knight", () => {
             const knight = pieces[0]
             const actualOpenMoves = knight.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -1006,7 +1006,7 @@ describe("Knight", () => {
             const knight = pieces[0]
             const actualOpenMoves = knight.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -1028,7 +1028,7 @@ describe("Knight", () => {
             const knight = pieces[0]
             const actualOpenMoves = knight.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -1093,7 +1093,7 @@ describe("King", () => {
             const king = pieces[0]
             const actualOpenMoves = king.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -1116,7 +1116,7 @@ describe("King", () => {
             const king = pieces[0]
             const actualOpenMoves = king.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -1138,7 +1138,7 @@ describe("King", () => {
             const king = pieces[0]
             const actualOpenMoves = king.getOpenMoves(board);
 
-            assert(compareCoordinates(actualOpenMoves, expectedOpenMoves));
+            compareCoordinates(actualOpenMoves, expectedOpenMoves);
 
         });
 
@@ -1252,7 +1252,7 @@ describe("getAvailableMoves", () => {
         const bishop = pieces[0]
         const actualAvailableMoves = getAvailableMoves(bishop, board);
 
-        assert(compareCoordinates(actualAvailableMoves, expectedAvailableMoves));
+        compareCoordinates(actualAvailableMoves, expectedAvailableMoves);
     });
 
     it("Piece can take piece putting king in check", () => {
@@ -1269,7 +1269,7 @@ describe("getAvailableMoves", () => {
         const bishop = pieces[0]
         const actualAvailableMoves = getAvailableMoves(bishop, board);
 
-        assert(compareCoordinates(actualAvailableMoves, expectedAvailableMoves));
+        compareCoordinates(actualAvailableMoves, expectedAvailableMoves);
     });
 
     it("Moving piece could put king in check", () => {
@@ -1289,7 +1289,7 @@ describe("getAvailableMoves", () => {
         const bishop = pieces[0]
         const actualAvailableMoves = getAvailableMoves(bishop, board);
 
-        assert(compareCoordinates(actualAvailableMoves, expectedAvailableMoves));
+        compareCoordinates(actualAvailableMoves, expectedAvailableMoves);
     });
 });
 
@@ -1383,9 +1383,7 @@ function compareCoordinates(actualCoordinates: Coordinate[], expectedCoordinates
                 is_open_move = true;
             }
         }
-        if (!is_open_move) {
-            return false;
-        }
+        assert(is_open_move, `Did not expect to find ${openMove.getString()} but did`);
     }
 
     for (let expectedOpenMove of expectedCoordinates) {
@@ -1395,9 +1393,7 @@ function compareCoordinates(actualCoordinates: Coordinate[], expectedCoordinates
                 is_open_move = true;
             }
         }
-        if (!is_open_move) {
-            return false;
-        }
+        assert(is_open_move, `Expected to find ${expectedOpenMove.getString()} but didn't`);
     }
 
     return true;

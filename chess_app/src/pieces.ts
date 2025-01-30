@@ -3,9 +3,11 @@ interface Piece {
      * Immutable piece at a given position on a chess board with a given color
      */
 
-    readonly position: Coordinate; // X position of the piece, with the left side having lower x positions
-    readonly color: 'White' | 'Black'; // color of the piece
-    readonly icon: string;
+    readonly position: Coordinate;
+    readonly color: 'White' | 'Black';
+    readonly icon: string; // path to the image representing this piece
+    readonly firstMove: boolean;
+    readonly enPassant: boolean;
 
     /**
      * @param board representation of the current state of the board
@@ -15,7 +17,7 @@ interface Piece {
      * This function gets spaces a piece could move to without considering if that would
      * put the player in check.
      */
-    getOpenMoves(board: Board): Coordinate[];
+    getOpenMoves(board: Board, castle?: boolean): Coordinate[];
 
     /**
      * @param newPosition position that this piece will be moved to
@@ -55,6 +57,14 @@ export class Coordinate {
      */
     public equals(other: Coordinate) {
         return this.column === other.column && this.row === other.row;
+    }
+
+    /**
+     * 
+     * @returns a string representation of this coordinate in the form (column, row)
+     */
+    public getString(): string {
+        return `${this.column}, ${this.row}`
     }
 }
 
@@ -120,36 +130,28 @@ export class Board {
 export class Pawn implements Piece {
     public readonly position: Coordinate;
     public readonly icon: string;
-    public readonly firstMove: boolean
     public constructor(
         public readonly color: 'White' | 'Black',
         column: number,
         row: number, 
+        public readonly firstMove: boolean = true,
+        public readonly enPassant: boolean = false
     ) {
         this.position = new Coordinate(column, row);
         this.icon = color === 'White' ? "/images/whitePawn.png" : "/images/blackPawn.png";
-        this.firstMove = false;
-        if (this.color === "White") {
-            if (row === 6) {
-                this.firstMove = true;
-            }
-        }
-        if (this.color === "Black") {
-            if (row === 1) {
-                this.firstMove = true;
-            }
-        }
     }
 
     /**
      * @inheritdoc
      */
-    public getOpenMoves(board: Board): Coordinate[] {
+    public getOpenMoves(board: Board, castle = false): Coordinate[] {
         const openMoves: Coordinate[] = new Array<Coordinate>();
         let forward = new Coordinate(this.position.column, this.position.row - 1);
         let left = new Coordinate(this.position.column - 1, this.position.row - 1);
         let right = new Coordinate(this.position.column + 1, this.position.row - 1);
         let doubleForward = new Coordinate(this.position.column, this.position.row - 2);
+        let leftHorizontal = new Coordinate(this.position.column - 1, this.position.row);
+        let rightHorizontal = new Coordinate(this.position.column + 1, this.position.row);
         if (this.color === 'Black') {
             forward = new Coordinate(this.position.column, this.position.row + 1);
             left = new Coordinate(this.position.column - 1, this.position.row + 1);
@@ -157,12 +159,14 @@ export class Pawn implements Piece {
             doubleForward = new Coordinate(this.position.column, this.position.row + 2);
         }
 
+        // Moves forward normally
         if (forward.inBounds()) {
             if (board.isEmpty(forward)) {
                 openMoves.push(forward);
             }
         }
 
+        // Can move two forward on its first move
         if (this.firstMove) {
             if (board.isEmpty(forward) && board.isEmpty(doubleForward)) {
                 openMoves.push(doubleForward);
@@ -170,6 +174,7 @@ export class Pawn implements Piece {
         }
 
 
+        // Can take an opposing piece to the left
         if (left.inBounds()) {
             if (!board.isEmpty(left)) {
                 if (this.color !== board.getPieceAt(left).color) {
@@ -178,11 +183,38 @@ export class Pawn implements Piece {
             }
         }
 
+        // Can take a pawn to the left horizontally with en passant
+        if (leftHorizontal.inBounds()) {
+            if (!board.isEmpty(leftHorizontal)) {
+                if (this.color !== board.getPieceAt(leftHorizontal).color) {
+                    if (board.getPieceAt(leftHorizontal) instanceof Pawn) {
+                        if (board.getPieceAt(leftHorizontal).enPassant) {
+                            openMoves.push(left)
+                        }
+                    }
+                }
+            }
+        }
 
+
+        // Can take an opposing piece to the right
         if (right.inBounds()) {
             if (!board.isEmpty(right)) {
                 if (this.color !== board.getPieceAt(right).color) {
                     openMoves.push(right);
+                }
+            }
+        }
+
+        // Can take a pawn to the right horizontally with en passant
+        if (rightHorizontal.inBounds()) {
+            if (!board.isEmpty(rightHorizontal)) {
+                if (this.color !== board.getPieceAt(rightHorizontal).color) {
+                    if (board.getPieceAt(rightHorizontal) instanceof Pawn) {
+                        if (board.getPieceAt(rightHorizontal).enPassant) {
+                            openMoves.push(right)
+                        }
+                    }
                 }
             }
         }
@@ -197,15 +229,68 @@ export class Pawn implements Piece {
         if (!newPosition.inBounds()) {
             throw new Error("Moving piece out of bounds");
         }
+
         const oldPieces = board.getPieces();
         const newPieces: Piece[] = [];
         for (let oldPiece of oldPieces) {
+            // Will be set to true if the pawn takes an opposing pawn with en passant
+            let takesEnPassant = false;
+
+            if (board.isEmpty(newPosition)) {
+
+                if (oldPiece instanceof Pawn) {
+                    if (oldPiece.enPassant) {
+                        if (oldPiece.position.column === newPosition.column) {
+
+                            if (this.color === "White") {
+
+                                if (oldPiece.position.row === newPosition.row + 1) {
+                                    takesEnPassant = true;
+                                }
+                            }
+
+                            if (this.color === "Black") {
+
+                                if (oldPiece.position.row === newPosition.row - 1) {
+                                    takesEnPassant = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
             if (!oldPiece.position.equals(newPosition) && !oldPiece.position.equals(this.position)) {
-                newPieces.push(oldPiece);
+                if (!takesEnPassant) {
+                    // Updates so that pawns can no longer be taken with en passant from their last move
+                    if (oldPiece instanceof Pawn) {
+                        const updatedPawn = new Pawn(oldPiece.color, oldPiece.position.column, oldPiece.position.row, oldPiece.firstMove, false);
+                        newPieces.push(updatedPawn);
+                    } else {
+                        newPieces.push(oldPiece);
+                    }
+                }
             }
         }
 
-        let addedPiece: Piece = new Pawn(this.color, newPosition.column, newPosition.row);
+        let enPassant = false
+        if (this.color === "White") {
+            if (this.position.row === 6) {
+                if (newPosition.row === 4) {
+                    enPassant = true;
+                }
+            }
+        }
+
+        if (this.color === "Black") {
+            if (this.position.row === 1) {
+                if (newPosition.row === 3) {
+                    enPassant = true;
+                }
+            }
+        }
+        
+        let addedPiece: Piece = new Pawn(this.color, newPosition.column, newPosition.row, false, enPassant);
         if (this.color === "White" && newPosition.row === 0) {
             addedPiece = new Queen(this.color, newPosition.column, newPosition.row);
         }
@@ -221,6 +306,8 @@ export class Pawn implements Piece {
 export class Bishop implements Piece {
     public readonly position: Coordinate;
     public readonly icon: string;
+    public readonly enPassant: boolean;
+    public readonly firstMove: boolean;
     public constructor(
         public readonly color: 'White' | 'Black',
         column: number,
@@ -228,12 +315,14 @@ export class Bishop implements Piece {
     ) {
         this.position = new Coordinate(column, row);
         this.icon = color === 'White' ? "/images/whiteBishop.png" : "/images/blackBishop.png";
+        this.firstMove = false;
+        this.enPassant = false;
     }
 
     /**
      * @inheritdoc
      */
-    public getOpenMoves(board: Board): Coordinate[] {
+    public getOpenMoves(board: Board, castle = false): Coordinate[] {
         const openMoves: Coordinate[] = new Array<Coordinate>();
         
         for (let direction of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) {
@@ -269,10 +358,16 @@ export class Bishop implements Piece {
         const newPieces: Piece[] = [];
         for (let oldPiece of oldPieces) {
             if (!oldPiece.position.equals(newPosition) && !oldPiece.position.equals(this.position)) {
-                newPieces.push(oldPiece);
+                // Updates so that pawns can no longer be taken with en passant from their last move
+                if (oldPiece instanceof Pawn) {
+                    const updatedPawn = new Pawn(oldPiece.color, oldPiece.position.column, oldPiece.position.row, oldPiece.firstMove, false);
+                    newPieces.push(updatedPawn);
+                } else {
+                    newPieces.push(oldPiece);
+                }
             }
         }
-        const addedPiece: Piece = new Bishop(this.color, newPosition.column, newPosition.row);;
+        const addedPiece: Piece = new Bishop(this.color, newPosition.column, newPosition.row);
         newPieces.push(addedPiece);
         return new Board(newPieces);
     }
@@ -282,19 +377,22 @@ export class Bishop implements Piece {
 export class Rook implements Piece {
     public readonly position: Coordinate;
     public readonly icon: string;
+    public readonly enPassant: boolean;
     public constructor(
         public readonly color: 'White' | 'Black',
         column: number,
         row: number, 
+        public readonly firstMove: boolean = true
     ) {
         this.position = new Coordinate(column, row);
         this.icon = color === 'White' ? "/images/whiteRook.png" : "/images/blackRook.png";
+        this.enPassant = false;
     }
 
     /**
      * @inheritdoc
      */
-    public getOpenMoves(board: Board): Coordinate[] {
+    public getOpenMoves(board: Board, castle = false): Coordinate[] {
         const openMoves: Coordinate[] = new Array<Coordinate>();
         
         for (let direction of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
@@ -332,10 +430,16 @@ export class Rook implements Piece {
         const newPieces: Piece[] = [];
         for (let oldPiece of oldPieces) {
             if (!oldPiece.position.equals(newPosition) && !oldPiece.position.equals(this.position)) {
-                newPieces.push(oldPiece);
+                // Updates so that pawns can no longer be taken with en passant from their last move
+                if (oldPiece instanceof Pawn) {
+                    const updatedPawn = new Pawn(oldPiece.color, oldPiece.position.column, oldPiece.position.row, oldPiece.firstMove, false);
+                    newPieces.push(updatedPawn);
+                } else {
+                    newPieces.push(oldPiece);
+                }
             }
         }
-        const addedPiece: Piece = new Rook(this.color, newPosition.column, newPosition.row);;
+        const addedPiece: Piece = new Rook(this.color, newPosition.column, newPosition.row, false);
         newPieces.push(addedPiece);
         return new Board(newPieces);
     }
@@ -345,6 +449,8 @@ export class Rook implements Piece {
 export class Queen implements Piece {
     public readonly position: Coordinate;
     public readonly icon: string;
+    public readonly enPassant: boolean;
+    public readonly firstMove: boolean;
     public constructor(
         public readonly color: 'White' | 'Black',
         column: number,
@@ -352,12 +458,14 @@ export class Queen implements Piece {
     ) {
         this.position = new Coordinate(column, row);
         this.icon = color === 'White' ? "/images/whiteQueen.png" : "/images/blackQueen.png";
+        this.firstMove = false;
+        this.enPassant = false;
     }
 
     /**
      * @inheritdoc
      */
-    public getOpenMoves(board: Board): Coordinate[] {
+    public getOpenMoves(board: Board, castle = false): Coordinate[] {
         const openMoves: Coordinate[] = new Array<Coordinate>();
         
         for (let direction of [[1, 1], [1, -1], [-1, 1], [-1, -1], [1, 0], [-1, 0], [0, 1], [0, -1]]) {
@@ -395,10 +503,16 @@ export class Queen implements Piece {
         const newPieces: Piece[] = [];
         for (let oldPiece of oldPieces) {
             if (!oldPiece.position.equals(newPosition) && !oldPiece.position.equals(this.position)) {
-                newPieces.push(oldPiece);
+                // Updates so that pawns can no longer be taken with en passant from their last move
+                if (oldPiece instanceof Pawn) {
+                    const updatedPawn = new Pawn(oldPiece.color, oldPiece.position.column, oldPiece.position.row, oldPiece.firstMove, false);
+                    newPieces.push(updatedPawn);
+                } else {
+                    newPieces.push(oldPiece);
+                }
             }
         }
-        const addedPiece: Piece = new Queen(this.color, newPosition.column, newPosition.row);;
+        const addedPiece: Piece = new Queen(this.color, newPosition.column, newPosition.row);
         newPieces.push(addedPiece);
         return new Board(newPieces);
     }
@@ -408,19 +522,22 @@ export class Queen implements Piece {
 export class King implements Piece {
     public readonly position: Coordinate;
     public readonly icon: string;
+    public readonly enPassant: boolean;
     public constructor(
         public readonly color: 'White' | 'Black',
         column: number,
         row: number, 
+        public readonly firstMove: boolean = true
     ) {
         this.position = new Coordinate(column, row);
         this.icon = color === 'White' ? "/images/whiteKing.png" : "/images/blackKing.png";
+        this.enPassant = false;
     }
 
     /**
      * @inheritdoc
      */
-    public getOpenMoves(board: Board): Coordinate[] {
+    public getOpenMoves(board: Board, castle: boolean = true): Coordinate[] {
         const openMoves: Coordinate[] = new Array<Coordinate>();
         
         for (let direction of [[1, 1], [1, -1], [-1, 1], [-1, -1], [1, 0], [-1, 0], [0, 1], [0, -1]]) {
@@ -441,6 +558,61 @@ export class King implements Piece {
             }
         }
 
+        if (castle) {
+            if (this.firstMove) {
+                let canQueensideCastle = true;
+                let canKingsideCastle = true;
+
+                let queensideCoordinate = new Coordinate(0, 7);
+                let kingsideCoordinate = new Coordinate(7, 7);
+                
+                if (this.color === "Black") {
+                    queensideCoordinate = new Coordinate(0, 0);
+                    kingsideCoordinate = new Coordinate(7, 0);
+                }
+
+                if (!board.isEmpty(queensideCoordinate)) {
+                    if (board.getPieceAt(queensideCoordinate) instanceof Rook) {
+                        if (board.getPieceAt(queensideCoordinate).firstMove) {
+                            for (let column = 4; column >= 2; column--) {
+                                const middlePosition = new Coordinate(column, this.position.row);
+                                if (!board.isEmpty(middlePosition)) {
+                                    canQueensideCastle = false;
+                                }
+                                if (inCheck(this.color, this.move(middlePosition, board))) {
+                                    canQueensideCastle = false;
+                                }
+                            }
+                            if (canQueensideCastle) {
+                                openMoves.push(new Coordinate(2, this.position.row));
+                            }
+                        }
+                    }
+                }
+                
+
+                if (!board.isEmpty(kingsideCoordinate)) {
+                    if (board.getPieceAt(kingsideCoordinate) instanceof Rook) {
+                        if (board.getPieceAt(kingsideCoordinate).firstMove) {
+                            for (let column = 4; column <= 6; column++) {
+                                const middlePosition = new Coordinate(column, this.position.row);
+                                if (!board.isEmpty(middlePosition)) {
+                                    canKingsideCastle = false;
+                                }
+                                if (inCheck(this.color, this.move(middlePosition, board))) {
+                                    canKingsideCastle = false;
+                                }
+                            }
+                            if (canKingsideCastle) {
+                                openMoves.push(new Coordinate(6, this.position.row));
+                            }
+                        }
+                    }
+                }
+                
+            }
+        }
+
         return openMoves;   
     }
 
@@ -451,14 +623,42 @@ export class King implements Piece {
         if (!newPosition.inBounds()) {
             throw new Error("Moving piece out of bounds");
         }
+        let queensideCastle = false;
+        let kingsideCastle = false;
+        if (this.firstMove && newPosition.equals(new Coordinate(2, this.position.row))) {
+            queensideCastle = true;
+        }
+        if (this.firstMove && newPosition.equals(new Coordinate(6, this.position.row))) {
+            kingsideCastle = true;
+        }
         const oldPieces = board.getPieces();
         const newPieces: Piece[] = [];
         for (let oldPiece of oldPieces) {
             if (!oldPiece.position.equals(newPosition) && !oldPiece.position.equals(this.position)) {
-                newPieces.push(oldPiece);
+                // Updates so that pawns can no longer be taken with en passant from their last move
+                if (oldPiece instanceof Pawn) {
+                    const updatedPawn = new Pawn(oldPiece.color, oldPiece.position.column, oldPiece.position.row, oldPiece.firstMove, false);
+                    newPieces.push(updatedPawn);
+                } else if (oldPiece instanceof Rook) {
+                    if (queensideCastle) {
+                        if (oldPiece.position.equals(new Coordinate(0, this.position.row))) {
+                            let updatedRook = new Rook(oldPiece.color, 3, this.position.row);
+                            newPieces.push(updatedRook);
+                        }
+                    } else if (kingsideCastle) {   
+                        if (oldPiece.position.equals(new Coordinate(7, this.position.row))) {
+                            let updatedRook = new Rook(oldPiece.color, 5, this.position.row);
+                            newPieces.push(updatedRook);
+                        }
+                    } else {
+                        newPieces.push(oldPiece);
+                    }
+                } else {
+                    newPieces.push(oldPiece);
+                }
             }
         }
-        const addedPiece: Piece = new King(this.color, newPosition.column, newPosition.row);;
+        const addedPiece: Piece = new King(this.color, newPosition.column, newPosition.row, false);
         newPieces.push(addedPiece);
         return new Board(newPieces);
     }
@@ -468,6 +668,8 @@ export class King implements Piece {
 export class Knight implements Piece {
     public readonly position: Coordinate;
     public readonly icon: string;
+    public readonly enPassant: boolean;
+    public readonly firstMove: boolean;
     public constructor(
         public readonly color: 'White' | 'Black',
         column: number,
@@ -475,12 +677,14 @@ export class Knight implements Piece {
     ) {
         this.position = new Coordinate(column, row);
         this.icon = color === 'White' ? "/images/whiteKnight.png" : "/images/blackKnight.png";
+        this.firstMove = false;
+        this.enPassant = false;
     }
 
     /**
      * @inheritdoc
      */
-    public getOpenMoves(board: Board): Coordinate[] {
+    public getOpenMoves(board: Board, castle = false): Coordinate[] {
         const openMoves: Coordinate[] = new Array<Coordinate>();
         
         for (let direction of [[2, 1], [1, 2], [-2, 1], [-1, 2], [2, -1], [1, -2], [-2, -1], [-1, -2]]) {
@@ -515,10 +719,16 @@ export class Knight implements Piece {
         const newPieces: Piece[] = [];
         for (let oldPiece of oldPieces) {
             if (!oldPiece.position.equals(newPosition) && !oldPiece.position.equals(this.position)) {
-                newPieces.push(oldPiece);
+                // Updates so that pawns can no longer be taken with en passant from their last move
+                if (oldPiece instanceof Pawn) {
+                    const updatedPawn = new Pawn(oldPiece.color, oldPiece.position.column, oldPiece.position.row, oldPiece.firstMove, false);
+                    newPieces.push(updatedPawn);
+                } else {
+                    newPieces.push(oldPiece);
+                }
             }
         }
-        const addedPiece: Piece = new Knight(this.color, newPosition.column, newPosition.row);;
+        const addedPiece: Piece = new Knight(this.color, newPosition.column, newPosition.row);
         newPieces.push(addedPiece);
         return new Board(newPieces);
     }
@@ -532,7 +742,7 @@ export class Knight implements Piece {
  */
 export function getAvailableMoves(piece: Piece, board: Board): Coordinate[] {
     const availableMoves: Coordinate[] = new Array<Coordinate>();
-    for (let openMove of piece.getOpenMoves(board)) {
+    for (let openMove of piece.getOpenMoves(board, true)) {
         if (!inCheck(piece.color, piece.move(openMove, board))) {
             availableMoves.push(openMove);
         }
@@ -566,7 +776,7 @@ export function inCheck(color: 'White' | 'Black', board: Board): boolean {
 
     for (let piece of board.getPieces()) {
         if (piece.color !== color) {
-            for (let openPosition of piece.getOpenMoves(board)) {
+            for (let openPosition of piece.getOpenMoves(board, false)) {
                 if (openPosition.equals(kingPosition)) {
                     return true;
                 }
@@ -587,7 +797,7 @@ export function inCheckmate(color: 'White' | 'Black', board: Board): boolean {
     if (inCheck(color, board)) {
         for (let piece of board.getPieces()) {
             if (piece.color === color) {
-                if (getAvailableMoves(piece,board).length !== 0) {
+                if (getAvailableMoves(piece, board).length !== 0) {
                     return false;
                 }
             }
