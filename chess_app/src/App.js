@@ -144,6 +144,7 @@ function ChessBoard({board, selectedPiece, color, handlePlay}) {
       }
     }
 
+
     let selectedText = 'No Piece Selected';
     if (selectedPiece !== null) {
       selectedText = selectedPiece.color + ' ' + selectedPiece.constructor.name + ' ' + selectedPiece.position.column + ', ' + selectedPiece.position.row;
